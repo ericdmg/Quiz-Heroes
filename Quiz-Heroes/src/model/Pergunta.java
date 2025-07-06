@@ -8,14 +8,12 @@ public class Pergunta {
     }
 
     private String enunciado;
-    private List<String> alternativas;
     private int indiceCorreto;
     private Dificuldade dificuldade;
     private int pontuacao;
 
-    public Pergunta(String enunciado, List<String> alternativas, int indiceCorreto, Dificuldade dificuldade, int pontuacao) {
+    public Pergunta(String enunciado, int indiceCorreto, Dificuldade dificuldade, int pontuacao) {
         this.enunciado = enunciado;
-        this.alternativas = alternativas;
         this.indiceCorreto = indiceCorreto;
         this.dificuldade = dificuldade;
         this.pontuacao = pontuacao;
@@ -23,10 +21,6 @@ public class Pergunta {
 
     public String getEnunciado() {
         return enunciado;
-    }
-
-    public List<String> getAlternativas() {
-        return alternativas;
     }
 
     public int getIndiceCorreto() {

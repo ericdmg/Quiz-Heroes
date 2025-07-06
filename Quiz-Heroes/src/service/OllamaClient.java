@@ -1,19 +1,26 @@
 package service;
 
+import view.QuizCLI;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class OllamaClient {
-    private static final String API_URL = "http://localhost:11434/api/generate";
-    private static final String MODEL = "llama3";
+    private final String API_URL = "http://localhost:11434/api/generate";
+    private final String MODEL = "llama3";
+    private final QuizCLI quizCLI;
 
-    public static String enviarPrompt(String prompt) {
+    public OllamaClient(QuizCLI quizCLI) {
+        this.quizCLI = quizCLI;
+    }
+
+    public  String enviarPrompt(String prompt) {
         return enviarParaOllama(prompt);
     }
 
-    private static String enviarParaOllama(String prompt) {
+    private String enviarParaOllama(String prompt) {
         try {
             HttpURLConnection conn = (HttpURLConnection) new URL(API_URL).openConnection();
             conn.setRequestMethod("POST");
@@ -58,7 +65,7 @@ public class OllamaClient {
         }
     }
 
-    public static boolean avaliarCertoErrado(String pergunta, String respostaJogador, StringBuilder explicacaoOut) {
+    public boolean avaliarCertoErrado(String pergunta, String respostaJogador, StringBuilder explicacaoOut) {
         String prompt = String.format(
                 "Pergunta do quiz: \"%s\"\n" +
                         "Resposta do jogador: \"%s\"\n\n" +
@@ -73,9 +80,6 @@ public class OllamaClient {
 
         String resposta = enviarParaOllama(prompt);
         if (resposta == null) return false;
-
-        // Debug opcional
-        System.out.println("[DEBUG LLM]: " + resposta);
 
         boolean correta = resposta.contains("\"correta\": true");
 
@@ -99,7 +103,7 @@ public class OllamaClient {
     }
 
 
-    private static String extrairResposta(String json) {
+    private String extrairResposta(String json) {
         try {
             int start = json.indexOf("\"response\":\"");
             if (start == -1) return json;
@@ -129,7 +133,7 @@ public class OllamaClient {
     }
 
 
-    private static String escapeJson(String text) {
+    private String escapeJson(String text) {
         if (text == null) return "";
         return text
                 .replace("\\", "\\\\")  // barra invertida primeiro!

@@ -1,14 +1,12 @@
 package service;
 
 import model.Pergunta;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
 public class QuizService {
-    private static final List<String> TEMAS = Arrays.asList(
+    private final List<String> TEMAS = Arrays.asList(
             "História",
             "Ciência",
             "Geografia",
@@ -18,48 +16,55 @@ public class QuizService {
             "Esportes"
     );
 
-    private static final Random random = new Random();
+    private final Random random = new Random();
+    private PerguntaService perguntaService;
+    private OllamaClient ollamaClient;
 
-    public static String sortearTema() {
+    public QuizService(PerguntaService perguntaService, OllamaClient ollamaClient) {
+        this.perguntaService = perguntaService;
+        this.ollamaClient = ollamaClient;
+    }
+
+    public String sortearTema() {
         int index = random.nextInt(TEMAS.size());
         return TEMAS.get(index);
     }
 
-    public static List<Pergunta> gerarPerguntas(String tema) {
-        List<Pergunta> todas = new ArrayList<>();
+//    public static List<Pergunta> gerarPerguntas(String tema) {
+//        List<Pergunta> todas = new ArrayList<>();
+//
+//        // Gerar 3 fáceis
+//        for (int i = 0; i < 3; i++) {
+//            todas.add(new Pergunta(
+//                    obterEnunciadoViaOllama(tema, Pergunta.Dificuldade.FACIL),
+//                    null, -1,
+//                    Pergunta.Dificuldade.FACIL,
+//                    10
+//            ));
+//        }
+//
+//        // 2 médias
+//        for (int i = 0; i < 2; i++) {
+//            todas.add(new Pergunta(
+//                    obterEnunciadoViaOllama(tema, Pergunta.Dificuldade.MEDIA),
+//                    null, -1,
+//                    Pergunta.Dificuldade.MEDIA,
+//                    20
+//            ));
+//        }
+//
+//        // 1 difícil
+//        todas.add(new Pergunta(
+//                obterEnunciadoViaOllama(tema, Pergunta.Dificuldade.DIFICIL),
+//                null, -1,
+//                Pergunta.Dificuldade.DIFICIL,
+//                30
+//        ));
+//
+//        return todas;
+//    }
 
-        // Gerar 3 fáceis
-        for (int i = 0; i < 3; i++) {
-            todas.add(new Pergunta(
-                    obterEnunciadoViaOllama(tema, Pergunta.Dificuldade.FACIL),
-                    null, -1,
-                    Pergunta.Dificuldade.FACIL,
-                    10
-            ));
-        }
-
-        // 2 médias
-        for (int i = 0; i < 2; i++) {
-            todas.add(new Pergunta(
-                    obterEnunciadoViaOllama(tema, Pergunta.Dificuldade.MEDIA),
-                    null, -1,
-                    Pergunta.Dificuldade.MEDIA,
-                    20
-            ));
-        }
-
-        // 1 difícil
-        todas.add(new Pergunta(
-                obterEnunciadoViaOllama(tema, Pergunta.Dificuldade.DIFICIL),
-                null, -1,
-                Pergunta.Dificuldade.DIFICIL,
-                30
-        ));
-
-        return todas;
-    }
-
-    private static String obterEnunciadoViaOllama(String tema, Pergunta.Dificuldade dificuldade) {
+    private String obterEnunciadoViaOllama(String tema, Pergunta.Dificuldade dificuldade) {
         String prompt = String.format(
                 "Gere uma afirmação sobre o tema \"%s\" com dificuldade %s. " +
                         "A afirmação deve terminar com 'Certo ou Errado?'. " +
@@ -68,7 +73,15 @@ public class QuizService {
                 tema, dificuldade.name().toLowerCase()
         );
 
-        String resposta = OllamaClient.enviarPrompt(prompt);
+        String resposta = this.ollamaClient.enviarPrompt(prompt);
         return resposta != null ? resposta : "[Erro ao obter pergunta]";
+    }
+
+    private final List<String> temasDisponiveis = Arrays.asList(
+            "História", "Ciência", "Geografia", "Matemática", "Literatura", "Tecnologia", "Esportes"
+    );
+
+    public List<Pergunta> gerarPerguntas(String tema) {
+        return this.perguntaService.gerarPerguntas(tema);
     }
 }

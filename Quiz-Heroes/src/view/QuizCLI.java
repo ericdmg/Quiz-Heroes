@@ -2,7 +2,6 @@ package view;
 
 import model.Pergunta;
 
-import java.util.List;
 import java.util.Scanner;
 
 public class QuizCLI {
@@ -42,10 +41,6 @@ public class QuizCLI {
 
     public void mostrarPergunta(Pergunta pergunta) {
         System.out.println("\n" + pergunta.getEnunciado());
-        List<String> alternativas = pergunta.getAlternativas();
-        for (int i = 0; i < alternativas.size(); i++) {
-            System.out.printf("%d) %s\n", i + 1, alternativas.get(i));
-        }
     }
 
     public int cronometroComPergunta(Pergunta pergunta) {
@@ -53,7 +48,7 @@ public class QuizCLI {
         final int[] resposta = { -1 };
 
         Thread entrada = new Thread(() -> {
-            System.out.print("Digite sua resposta (1-" + pergunta.getAlternativas().size() + "): ");
+            //System.out.print("Digite sua resposta (1-" + pergunta.getAlternativas().size() + "): ");
             Scanner s = new Scanner(System.in);
             try {
                 resposta[0] = s.nextInt() - 1; // converte para índice 0-based
