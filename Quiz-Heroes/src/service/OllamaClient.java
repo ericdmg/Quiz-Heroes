@@ -1,11 +1,13 @@
 package service;
 
+import model.Pergunta;
 import view.QuizCLI;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class OllamaClient {
     private final String API_URL = "http://localhost:11434/api/generate";
@@ -131,6 +133,58 @@ public class OllamaClient {
             return json;
         }
     }
+
+    public String construirContextoHistorico(List<Pergunta> perguntasAnteriores) {
+        StringBuilder contexto = new StringBuilder();
+        for (Pergunta p : perguntasAnteriores) {
+            if (p.getRespostaDoJogador() != null) {
+                contexto.append("Pergunta: ").append(p.getEnunciado()).append("\n");
+                contexto.append("Resposta do jogador: ").append(p.getRespostaDoJogador()).append("\n\n");
+            }
+        }
+        return contexto.toString();
+    }
+
+    public boolean avaliarCertoErradoComContexto(String contexto, Pergunta pergunta, StringBuilder explicacaoOut) {
+        String prompt = String.format(
+                "%s\n" +
+                        "Agora, avalie a nova afirmação abaixo:\n\n" +
+                        "Pergunta do quiz: \"%s\"\n" +
+                        "Resposta do jogador: \"%s\"\n\n" +
+                        "Avalie se o jogador julgou corretamente a afirmação como 'Certo' ou 'Errado'.\n\n" +
+                        "Se estiver correto:\n" +
+                        "{\"correta\": true}\n" +
+                        "Se estiver incorreto:\n" +
+                        "{\"correta\": false, \"explicacao\": \"Explique brevemente o erro.\"}\n\n" +
+                        "Responda apenas com o JSON.",
+                contexto, pergunta.getEnunciado(), pergunta.getRespostaDoJogador()
+        );
+
+        String resposta = enviarParaOllama(prompt);
+        pergunta.setPromptGerado(prompt); // salvar o prompt final
+        pergunta.setRespostaGerada(resposta); // salvar a resposta crua do modelo
+
+        if (resposta == null) return false;
+
+        boolean correta = resposta.contains("\"correta\": true");
+
+        if (!correta) {
+            int start = resposta.indexOf("\"explicacao\":");
+            if (start != -1) {
+                start += "\"explicacao\":".length();
+                String sub = resposta.substring(start).trim();
+                if (sub.startsWith("\"")) sub = sub.substring(1);
+                int end = sub.indexOf("\"");
+                if (end != -1) {
+                    String explicacao = sub.substring(0, end).replaceAll("[{}]", "").trim();
+                    explicacaoOut.append(explicacao);
+                }
+            }
+        }
+
+        return correta;
+    }
+
 
 
     private String escapeJson(String text) {

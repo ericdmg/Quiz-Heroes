@@ -1,11 +1,14 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Jogador {
     private String nome;
     private String id;
     private int pontuacao;
+    private List<Pergunta> perguntasRespondidas = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {
@@ -39,5 +42,13 @@ public class Jogador {
 
     public void adicionarPontos(int pontos) {
         this.pontuacao += pontos;
+    }
+
+    public void registrarResposta(Pergunta pergunta) {
+        perguntasRespondidas.add(pergunta);
+    }
+
+    public List<Pergunta> getPerguntasRespondidas() {
+        return perguntasRespondidas;
     }
 }
