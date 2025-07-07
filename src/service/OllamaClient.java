@@ -14,10 +14,6 @@ public class OllamaClient {
     private final String MODEL = "llama3";
 
     public  String enviarPrompt(String prompt) {
-        return enviarParaOllama(prompt);
-    }
-
-    private String enviarParaOllama(String prompt) {
         try {
             HttpURLConnection conn = (HttpURLConnection) new URL(this.API_URL).openConnection();
             conn.setRequestMethod("POST");
@@ -62,40 +58,5 @@ public class OllamaClient {
         }
     }
 
-    public String construirContextoHistorico(List<Pergunta> perguntasAnteriores) {
-        StringBuilder contexto = new StringBuilder();
-        for (Pergunta p : perguntasAnteriores) {
-            if (p.getRespostaDoJogador() != null) {
-                contexto.append("Pergunta: ").append(p.getEnunciado()).append("\n");
-                contexto.append("Resposta do jogador: ").append(p.getRespostaDoJogador()).append("\n\n");
-            }
-        }
-        return contexto.toString();
-    }
 
-    public boolean avaliarCertoErradoComContexto(String contexto, Pergunta pergunta, StringBuilder explicacaoOut) {
-        String prompt = String.format(
-                "%s\n" +
-                        "Agora, avalie a nova afirmação abaixo:\n\n" +
-                        "Pergunta do quiz: \"%s\"\n" +
-                        "Resposta do jogador: \"%s\"\n\n" +
-                        "Avalie se o jogador julgou corretamente a afirmação como 'Certo' ou 'Errado'.\n\n" +
-                        "Se estiver correto:\n" +
-                        "{\"correta\": true}\n" +
-                        "Se estiver incorreto:\n" +
-                        "{\"correta\": false, \"explicacao\": \"Explique brevemente o erro.\"}\n\n" +
-                        "Responda apenas com o JSON.",
-                contexto, pergunta.getEnunciado(), pergunta.getRespostaDoJogador()
-        );
-
-        String resposta = enviarParaOllama(prompt);
-        pergunta.setPromptGerado(prompt); // salvar o prompt final
-        pergunta.setRespostaGerada(resposta); // salvar a resposta crua do modelo
-
-        if (resposta == null) return false;
-
-        boolean correta = OllamaParser.avaliarRespostaComExplicacao(resposta, explicacaoOut);
-
-        return correta;
-    }
 }

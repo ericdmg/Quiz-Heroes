@@ -3,6 +3,7 @@ package service;
 import model.Jogador;
 import model.Pergunta;
 import model.Quiz;
+import util.OllamaParser;
 import view.QuizCLI;
 
 import java.util.*;
@@ -86,10 +87,10 @@ public class QuizService {
 
                 view.mostrarMensagem("🔎 Avaliando resposta...");
 
-                String contexto = this.ollamaClient.construirContextoHistorico(perguntasRespondidas);
+                String contexto = this.construirContextoHistorico(perguntasRespondidas);
 
                 StringBuilder explicacao = new StringBuilder();
-                boolean correta = this.ollamaClient.avaliarCertoErradoComContexto(contexto, pergunta, explicacao);
+                boolean correta = this.avaliarCertoErradoComContexto(contexto, pergunta, explicacao);
 
                 if (correta) {
                     jogador.adicionarPontos(pergunta.getPontuacao());
@@ -153,8 +154,6 @@ public class QuizService {
         }
     }
 
-
-
     public void cadastrarJogadores(Quiz quiz) {
         Map<String, Jogador> jogadores = new HashMap<>();
         int total = view.perguntarNumeroJogadores(1, 5);
@@ -167,5 +166,42 @@ public class QuizService {
         }
 
         quiz.setJogadores(jogadores);
+    }
+
+    public String construirContextoHistorico(List<Pergunta> perguntasAnteriores) {
+        StringBuilder contexto = new StringBuilder();
+        for (Pergunta p : perguntasAnteriores) {
+            if (p.getRespostaDoJogador() != null) {
+                contexto.append("Pergunta: ").append(p.getEnunciado()).append("\n");
+                contexto.append("Resposta do jogador: ").append(p.getRespostaDoJogador()).append("\n\n");
+            }
+        }
+        return contexto.toString();
+    }
+
+    public boolean avaliarCertoErradoComContexto(String contexto, Pergunta pergunta, StringBuilder explicacaoOut) {
+        String prompt = String.format(
+                "%s\n" +
+                        "Agora, avalie a nova afirmação abaixo:\n\n" +
+                        "Pergunta do quiz: \"%s\"\n" +
+                        "Resposta do jogador: \"%s\"\n\n" +
+                        "Avalie se o jogador julgou corretamente a afirmação como 'Certo' ou 'Errado'.\n\n" +
+                        "Se estiver correto:\n" +
+                        "{\"correta\": true}\n" +
+                        "Se estiver incorreto:\n" +
+                        "{\"correta\": false, \"explicacao\": \"Explique brevemente o erro.\"}\n\n" +
+                        "Responda apenas com o JSON.",
+                contexto, pergunta.getEnunciado(), pergunta.getRespostaDoJogador()
+        );
+
+        String resposta = this.ollamaClient.enviarPrompt(prompt);
+        pergunta.setPromptGerado(prompt); // salvar o prompt final
+        pergunta.setRespostaGerada(resposta); // salvar a resposta crua do modelo
+
+        if (resposta == null) return false;
+
+        boolean correta = OllamaParser.avaliarRespostaComExplicacao(resposta, explicacaoOut);
+
+        return correta;
     }
 }
