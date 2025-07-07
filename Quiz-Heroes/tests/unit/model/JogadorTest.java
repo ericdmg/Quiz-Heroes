@@ -1,5 +1,7 @@
-package model;
+package unit.model;
 
+import model.Jogador;
+import model.Pergunta;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
