@@ -1,24 +1,26 @@
 package model;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Quiz {
     private String tema;
-    private List<Jogador> jogadores;
+    private Map<String, Jogador> jogadores = new HashMap<>();
 
     public void setTema(String tema) {
         this.tema = tema;
-    }
-
-    public void setJogadores(List<Jogador> jogadores) {
-        this.jogadores = jogadores;
     }
 
     public String getTema() {
         return tema;
     }
 
-    public List<Jogador> getJogadores() {
+    public Map<String, Jogador> getJogadores() {
         return jogadores;
     }
+
+    public void setJogadores(Map<String, Jogador> jogadores) {
+        this.jogadores = jogadores;
+    }
+
 }

@@ -4,7 +4,6 @@ public class Pergunta {
     public enum Dificuldade {
         FACIL, MEDIA, DIFICIL
     }
-
     private String enunciado;
     private int indiceCorreto;
     private Dificuldade dificuldade;
@@ -12,12 +11,9 @@ public class Pergunta {
     private String respostaGerada;
     private String respostaDoJogador;
     private String explicacaoErro;
-
-
-
-
-    // Novo campo
     private String promptGerado;
+    private int pontosRecebidos;
+
 
     public Pergunta(String enunciado, int indiceCorreto, Dificuldade dificuldade, int pontuacao) {
         this.enunciado = enunciado;
@@ -46,7 +42,6 @@ public class Pergunta {
         return escolhaUsuario == indiceCorreto;
     }
 
-    // Getters e setters do novo campo
     public String getPromptGerado() {
         return promptGerado;
     }
@@ -77,5 +72,13 @@ public class Pergunta {
 
     public String getExplicacaoErro() {
         return this.explicacaoErro;
+    }
+
+    public int getPontosRecebidos() {
+        return this.pontosRecebidos;
+    }
+
+    public void setPontosRecebidos(int pontosRecebidos) {
+        this.pontosRecebidos = pontosRecebidos;
     }
 }

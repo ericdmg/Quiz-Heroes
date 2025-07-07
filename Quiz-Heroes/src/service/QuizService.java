@@ -5,10 +5,7 @@ import model.Pergunta;
 import model.Quiz;
 import view.QuizCLI;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class QuizService {
     private static final List<String> TEMAS = Arrays.asList(
@@ -75,7 +72,7 @@ public class QuizService {
     }
 
     public void executarRodadas(Quiz quiz) {
-        for (Jogador jogador : quiz.getJogadores()) {
+        for (Jogador jogador : quiz.getJogadores().values()) {
             view.mostrarMensagem("\nRodada para: " + jogador.getNome());
 
             // gerar perguntas diferentes para este jogador
@@ -96,8 +93,10 @@ public class QuizService {
 
                 if (correta) {
                     jogador.adicionarPontos(pergunta.getPontuacao());
+                    pergunta.setPontosRecebidos(pergunta.getPontuacao());  // <-- CORRIGIDO
                     view.mostrarMensagem("✅ Resposta correta! +" + pergunta.getPontuacao() + " pontos.");
                 } else {
+                    pergunta.setPontosRecebidos(0);  // <-- também importante
                     view.mostrarMensagem("❌ Resposta incorreta.");
                     if (!explicacao.isEmpty()) {
                         view.mostrarMensagem("💡 Explicação: " + explicacao.toString());
@@ -113,8 +112,8 @@ public class QuizService {
     public void gerarRelatorioFinal(Quiz quiz, QuizCLI view) {
         view.mostrarMensagem("\n📊 RELATÓRIO FINAL DO QUIZ\n");
 
-        // Ordena jogadores por pontuação (descendente)
-        List<Jogador> jogadoresOrdenados = new ArrayList<>(quiz.getJogadores());
+        // Convertendo valores do mapa para lista e ordenando por pontuação
+        List<Jogador> jogadoresOrdenados = new ArrayList<>(quiz.getJogadores().values());
         jogadoresOrdenados.sort((a, b) -> Integer.compare(b.getPontuacao(), a.getPontuacao()));
 
         for (int i = 0; i < jogadoresOrdenados.size(); i++) {
@@ -133,17 +132,17 @@ public class QuizService {
 
             int total = jogador.getPerguntasRespondidas().size();
             long acertos = jogador.getPerguntasRespondidas().stream()
-                    .filter(p -> p.getPontuacao() > 0)
+                    .filter(p -> p.getPontosRecebidos() > 0)
                     .count();
 
             int percentual = total > 0 ? (int) ((100.0 * acertos) / total) : 0;
             view.mostrarMensagem("Acertos: " + acertos + "/" + total + " (" + percentual + "%)");
 
             for (Pergunta p : jogador.getPerguntasRespondidas()) {
-                String status = p.getPontuacao() > 0 ? "✅" : "❌";
+                String status = p.getPontosRecebidos() > 0 ? "✅" : "❌";
                 view.mostrarMensagem(status + " " + p.getEnunciado());
                 view.mostrarMensagem("Resposta: " + p.getRespostaDoJogador());
-                view.mostrarMensagem("Pontos: " + p.getPontuacao());
+                view.mostrarMensagem("Pontos: " + p.getPontosRecebidos());
 
                 String erro = p.getExplicacaoErro();
                 if (erro != null && !erro.isBlank()) {
@@ -157,14 +156,18 @@ public class QuizService {
     }
 
 
+
     public void cadastrarJogadores(Quiz quiz) {
-        List<Jogador> jogadores = new ArrayList<>();
-        int total = this.view.perguntarNumeroJogadores(1, 5);
+        Map<String, Jogador> jogadores = new HashMap<>();
+        int total = view.perguntarNumeroJogadores(1, 5);
+
         for (int i = 0; i < total; i++) {
-            String nome = this.view.perguntarNomeJogador(i + 1);
-            String id = this.view.perguntarIdJogador(nome);
-            jogadores.add(new Jogador(nome, id));
+            String nome = view.perguntarNomeJogador(i + 1);
+            Jogador jogador = new Jogador(nome);
+            jogadores.put(jogador.getId(), jogador);
+            view.mostrarMensagem("✅ Jogador '" + nome + "' registrado com ID: " + jogador.getId());
         }
-        quiz.setJogadores(jogadores); // atualiza o objeto Quiz diretamente
+
+        quiz.setJogadores(jogadores);
     }
 }

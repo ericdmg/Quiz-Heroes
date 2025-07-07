@@ -1,6 +1,5 @@
 package view;
 
-import model.Pergunta;
 
 import java.util.Scanner;
 
@@ -20,11 +19,6 @@ public class QuizCLI {
 
     public String perguntarNomeJogador(int numero) {
         System.out.printf("Digite o nome do jogador %d: ", numero);
-        return scanner.nextLine();
-    }
-
-    public String perguntarIdJogador(String nome) {
-        System.out.printf("Digite um ID único para o jogador %s: ", nome);
         return scanner.nextLine();
     }
 

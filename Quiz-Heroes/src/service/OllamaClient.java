@@ -12,11 +12,6 @@ import java.util.List;
 public class OllamaClient {
     private final String API_URL = "http://localhost:11434/api/generate";
     private final String MODEL = "llama3";
-    private final QuizCLI quizCLI;
-
-    public OllamaClient(QuizCLI quizCLI) {
-        this.quizCLI = quizCLI;
-    }
 
     public  String enviarPrompt(String prompt) {
         return enviarParaOllama(prompt);
@@ -66,44 +61,6 @@ public class OllamaClient {
             return null;
         }
     }
-
-    public boolean avaliarCertoErrado(String pergunta, String respostaJogador, StringBuilder explicacaoOut) {
-        String prompt = String.format(
-                "Pergunta do quiz: \"%s\"\n" +
-                        "Resposta do jogador: \"%s\"\n\n" +
-                        "Avalie se a resposta do jogador está correta com base na pergunta. A resposta do jogador é uma tentativa de julgar a afirmação como 'Certo' ou 'Errado'. " +
-                        "Se o julgamento dele estiver correto, responda com:\n" +
-                        "{\"correta\": true}\n" +
-                        "Caso contrário, responda com:\n" +
-                        "{\"correta\": false, \"explicacao\": \"Explique por que a resposta está errada.\"}\n\n" +
-                        "Atenção: avalie a resposta do jogador em relação à veracidade da pergunta. Responda apenas com o JSON.",
-                pergunta, respostaJogador
-        );
-
-        String resposta = enviarParaOllama(prompt);
-        if (resposta == null) return false;
-
-        boolean correta = resposta.contains("\"correta\": true");
-
-        if (!correta) {
-            // Extrai explicação com segurança
-            int start = resposta.indexOf("\"explicacao\":");
-            if (start != -1) {
-                start += "\"explicacao\":".length();
-                // Remove aspas extras e espaços
-                String sub = resposta.substring(start).trim();
-                if (sub.startsWith("\"")) sub = sub.substring(1);
-                int end = sub.indexOf("\"");
-                if (end != -1) {
-                    String explicacao = sub.substring(0, end).replaceAll("[{}]", "").trim();
-                    explicacaoOut.append(explicacao);
-                }
-            }
-        }
-
-        return correta;
-    }
-
 
     private String extrairResposta(String json) {
         try {

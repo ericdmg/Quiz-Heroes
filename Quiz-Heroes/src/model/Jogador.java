@@ -3,6 +3,7 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 public class Jogador {
     private String nome;
@@ -22,9 +23,9 @@ public class Jogador {
         return Objects.hash(nome, id, pontuacao);
     }
 
-    public Jogador(String nome, String id) {
+    public Jogador(String nome) {
         this.nome = nome;
-        this.id = id;
+        this.id = UUID.randomUUID().toString().substring(0, 8); // ID curto e único
         this.pontuacao = 0;
     }
 
