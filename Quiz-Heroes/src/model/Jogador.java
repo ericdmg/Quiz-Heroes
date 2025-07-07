@@ -15,7 +15,7 @@ public class Jogador {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Jogador jogador = (Jogador) o;
-        return pontuacao == jogador.pontuacao && Objects.equals(nome, jogador.nome) && Objects.equals(id, jogador.id);
+        return this.pontuacao == jogador.pontuacao && Objects.equals(nome, jogador.nome) && Objects.equals(id, jogador.id);
     }
 
     @Override
@@ -30,15 +30,15 @@ public class Jogador {
     }
 
     public String getNome() {
-        return nome;
+        return this.nome;
     }
 
     public String getId() {
-        return id;
+        return this.id;
     }
 
     public int getPontuacao() {
-        return pontuacao;
+        return this.pontuacao;
     }
 
     public void adicionarPontos(int pontos) {
@@ -46,10 +46,10 @@ public class Jogador {
     }
 
     public void registrarResposta(Pergunta pergunta) {
-        perguntasRespondidas.add(pergunta);
+        this.perguntasRespondidas.add(pergunta);
     }
 
     public List<Pergunta> getPerguntasRespondidas() {
-        return perguntasRespondidas;
+        return this.perguntasRespondidas;
     }
 }

@@ -1,7 +1,7 @@
 package service;
 
 import model.Pergunta;
-import view.QuizCLI;
+import util.OllamaParser;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -19,7 +19,7 @@ public class OllamaClient {
 
     private String enviarParaOllama(String prompt) {
         try {
-            HttpURLConnection conn = (HttpURLConnection) new URL(API_URL).openConnection();
+            HttpURLConnection conn = (HttpURLConnection) new URL(this.API_URL).openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json; utf-8");
             conn.setRequestProperty("Accept", "application/json");
@@ -27,7 +27,7 @@ public class OllamaClient {
 
             String jsonInput = String.format(
                     "{\"model\": \"%s\", \"prompt\": \"%s\", \"stream\": false}",
-                    MODEL, escapeJson(prompt)
+                    this.MODEL, OllamaParser.escapeJson(prompt)
             );
 
             try (OutputStream os = conn.getOutputStream()) {
@@ -54,40 +54,11 @@ public class OllamaClient {
                 response.append(line.trim());
             }
 
-            return extrairResposta(response.toString());
+            return OllamaParser.extrairRespostaBruta(response.toString());
 
         } catch (IOException e) {
             System.err.println("Erro na requisição ao Ollama: " + e.getMessage());
             return null;
-        }
-    }
-
-    private String extrairResposta(String json) {
-        try {
-            int start = json.indexOf("\"response\":\"");
-            if (start == -1) return json;
-
-            start += "\"response\":\"".length();
-            StringBuilder sb = new StringBuilder();
-            boolean escape = false;
-
-            for (int i = start; i < json.length(); i++) {
-                char c = json.charAt(i);
-
-                if (!escape && c == '\"') break;  // fim da string JSON
-                if (c == '\\') {
-                    escape = !escape;
-                    if (!escape) sb.append(c); // keep single slash
-                    continue;
-                }
-                sb.append(c);
-                escape = false;
-            }
-
-            return sb.toString().replace("\\n", "\n").trim();
-        } catch (Exception e) {
-            System.err.println("Erro ao extrair campo response: " + json);
-            return json;
         }
     }
 
@@ -123,34 +94,8 @@ public class OllamaClient {
 
         if (resposta == null) return false;
 
-        boolean correta = resposta.contains("\"correta\": true");
-
-        if (!correta) {
-            int start = resposta.indexOf("\"explicacao\":");
-            if (start != -1) {
-                start += "\"explicacao\":".length();
-                String sub = resposta.substring(start).trim();
-                if (sub.startsWith("\"")) sub = sub.substring(1);
-                int end = sub.indexOf("\"");
-                if (end != -1) {
-                    String explicacao = sub.substring(0, end).replaceAll("[{}]", "").trim();
-                    explicacaoOut.append(explicacao);
-                }
-            }
-        }
+        boolean correta = OllamaParser.avaliarRespostaComExplicacao(resposta, explicacaoOut);
 
         return correta;
-    }
-
-
-
-    private String escapeJson(String text) {
-        if (text == null) return "";
-        return text
-                .replace("\\", "\\\\")  // barra invertida primeiro!
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r")
-                .replace("\t", "\\t");
     }
 }

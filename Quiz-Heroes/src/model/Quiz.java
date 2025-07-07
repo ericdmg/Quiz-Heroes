@@ -12,11 +12,11 @@ public class Quiz {
     }
 
     public String getTema() {
-        return tema;
+        return this.tema;
     }
 
     public Map<String, Jogador> getJogadores() {
-        return jogadores;
+        return this.jogadores;
     }
 
     public void setJogadores(Map<String, Jogador> jogadores) {

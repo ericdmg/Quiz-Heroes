@@ -23,27 +23,27 @@ public class Pergunta {
     }
 
     public String getEnunciado() {
-        return enunciado;
+        return this.enunciado;
     }
 
     public int getIndiceCorreto() {
-        return indiceCorreto;
+        return this.indiceCorreto;
     }
 
     public Dificuldade getDificuldade() {
-        return dificuldade;
+        return this.dificuldade;
     }
 
     public int getPontuacao() {
-        return pontuacao;
+        return this.pontuacao;
     }
 
     public boolean estaCorreta(int escolhaUsuario) {
-        return escolhaUsuario == indiceCorreto;
+        return escolhaUsuario == this.indiceCorreto;
     }
 
     public String getPromptGerado() {
-        return promptGerado;
+        return this.promptGerado;
     }
 
     public String getRespostaGerada() {

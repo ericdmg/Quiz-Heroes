@@ -109,17 +109,15 @@ public class QuizService {
         }
     }
 
-    public void gerarRelatorioFinal(Quiz quiz, QuizCLI view) {
-        view.mostrarMensagem("\n📊 RELATÓRIO FINAL DO QUIZ\n");
+    public void gerarRelatorioFinal(Quiz quiz) {
+        this.view.mostrarMensagem("\n📊 RELATÓRIO FINAL DO QUIZ\n");
 
-        // Convertendo valores do mapa para lista e ordenando por pontuação
         List<Jogador> jogadoresOrdenados = new ArrayList<>(quiz.getJogadores().values());
         jogadoresOrdenados.sort((a, b) -> Integer.compare(b.getPontuacao(), a.getPontuacao()));
 
         for (int i = 0; i < jogadoresOrdenados.size(); i++) {
             Jogador jogador = jogadoresOrdenados.get(i);
 
-            // Medalha
             String medalha = switch (i) {
                 case 0 -> "🥇";
                 case 1 -> "🥈";
@@ -148,7 +146,7 @@ public class QuizService {
                 if (erro != null && !erro.isBlank()) {
                     view.mostrarMensagem("💡 Explicação: " + erro);
                 }
-                view.mostrarMensagem(""); // linha em branco
+                view.mostrarMensagem("");
             }
 
             view.mostrarMensagem("--------------------------------------------------");

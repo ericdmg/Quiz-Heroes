@@ -13,18 +13,18 @@ public class QuizCLI {
     public int perguntarNumeroJogadores(int min, int max) {
         System.out.printf("Quantos jogadores vão participar? (%d-%d): ", min, max);
         int qtd = scanner.nextInt();
-        scanner.nextLine(); // limpar buffer
+        this.scanner.nextLine(); // limpar buffer
         return qtd;
     }
 
     public String perguntarNomeJogador(int numero) {
         System.out.printf("Digite o nome do jogador %d: ", numero);
-        return scanner.nextLine();
+        return this.scanner.nextLine();
     }
 
     public String capturarRespostaTexto() {
         System.out.print("Sua resposta: ");
-        return scanner.nextLine();
+        return this.scanner.nextLine();
     }
 
 }

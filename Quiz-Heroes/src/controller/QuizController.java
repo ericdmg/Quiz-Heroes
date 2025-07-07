@@ -1,13 +1,11 @@
 package controller;
 
 import model.Jogador;
-import model.Pergunta;
 import model.Quiz;
 import service.*;
 import view.QuizCLI;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class QuizController {
@@ -20,6 +18,13 @@ public class QuizController {
         this.view = new QuizCLI();
         this.ollamaClient = new OllamaClient();
         this.quizService = new QuizService(this.view, this.ollamaClient);
+        this.quizzes = new HashSet<>();
+    }
+
+    public QuizController(QuizCLI view, OllamaClient ollamaClient) {
+        this.view = view;
+        this.ollamaClient = ollamaClient;
+        this.quizService = new QuizService(view, ollamaClient);
         this.quizzes = new HashSet<>();
     }
 
@@ -42,7 +47,7 @@ public class QuizController {
         quizService.cadastrarJogadores(quiz);       // preenche jogadores
         quiz.setTema(tema);
         this.quizService.executarRodadas(quiz);
-        this.quizService.gerarRelatorioFinal(quiz, this.view);
+        this.quizService.gerarRelatorioFinal(quiz);
 
         this.view.mostrarMensagem("\n" +
                 "   ____  ____  _____  _____ _____          _____   ____           _____   ____  _____                _  ____   _____          _____  \n" +
@@ -57,30 +62,30 @@ public class QuizController {
     }
 
     public void exibirJogadores() {
-        view.mostrarMensagem("\n👥 Jogadores registrados:");
+        this.view.mostrarMensagem("\n👥 Jogadores registrados:");
         if (this.quizzes.isEmpty()) {
-            view.mostrarMensagem("Nenhum quiz realizado ainda.");
+            this.view.mostrarMensagem("Nenhum quiz realizado ainda.");
             return;
         }
 
         for (Quiz quiz : this.quizzes) {
             for (Jogador j : quiz.getJogadores().values()) {
-                view.mostrarMensagem("- " + j.getNome() + " (ID: " + j.getId() + ")");
+                this.view.mostrarMensagem("- " + j.getNome() + " (ID: " + j.getId() + ")");
             }
         }
     }
 
     public void listarRelatorios() {
-        view.mostrarMensagem("\n📊 Relatórios de quizzes anteriores:");
+        this.view.mostrarMensagem("\n📊 Relatórios de quizzes anteriores:");
 
         if (this.quizzes.isEmpty()) {
-            view.mostrarMensagem("Nenhum quiz realizado ainda.");
+            this.view.mostrarMensagem("Nenhum quiz realizado ainda.");
             return;
         }
 
         for (Quiz quiz : this.quizzes) {
-            view.mostrarMensagem("▶ Tema: " + quiz.getTema());
-            quizService.gerarRelatorioFinal(quiz, view);
+            this.view.mostrarMensagem("▶ Tema: " + quiz.getTema());
+            this.quizService.gerarRelatorioFinal(quiz);
         }
     }
 }
