@@ -106,21 +106,40 @@ O [Ollama](https://ollama.com) permite executar modelos de linguagem localmente 
 Digite o nome do jogador 1: Eric
 Digite o nome do jogador 2: Ellen
 
+🌀 Sorteando tema...
+🧠 Tema selecionado: História
+
+👤 Rodada para: Eric
+
 🧠 Gerando pergunta...
-Jogador: Eric
-Pergunta: "Qual foi o principal motivo da queda do Império Romano?"
-a) Guerras Civis
-b) Crise Econômica
-c) Invasões Bárbaras
-d) Cristianismo
-> Sua resposta: c
-✅ Correto!
+
+Pergunta: "O Império Romano caiu exclusivamente por invasões bárbaras. Certo ou Errado?"
+> Sua resposta: Errado
+🔎 Avaliando resposta...
+✅ Resposta correta! +10 pontos.
+
+Pergunta: "Júlio César foi o primeiro imperador romano. Certo ou Errado?"
+> Sua resposta: Certo
+🔎 Avaliando resposta...
+❌ Resposta incorreta.
+💡 Explicação: Júlio César nunca foi imperador, mas sim ditador perpétuo. O primeiro imperador foi Augusto.
+
+...
+
+👤 Rodada para: Ellen
+
+🧠 Gerando pergunta...
+
+Pergunta: "A queda de Constantinopla ocorreu antes da Idade Média. Certo ou Errado?"
+> Sua resposta: Errado
+🔎 Avaliando resposta...
+✅ Resposta correta! +10 pontos.
 
 ...
 
 🎉 Fim da partida! Ranking:
-1. Eric - 3 acertos
-2. Ellen - 2 acertos
+🥇 Eric - 30 pontos
+🥈 Ellen - 20 pontos
 ```
 
 ---
