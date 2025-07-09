@@ -180,18 +180,26 @@ public class QuizService {
     }
 
     public boolean avaliarCertoErradoComContexto(String contexto, Pergunta pergunta, StringBuilder explicacaoOut) {
+        // Montar o JSON com a pergunta e a resposta do jogador
+        String jsonPergunta = String.format(
+                "{\n" +
+                        "  \"pergunta\": \"%s\",\n" +
+                        "  \"resposta_usuario\": \"%s\"\n" +
+                        "}",
+                pergunta.getEnunciado(),
+                pergunta.getRespostaDoJogador()
+        );
+
+        // Prompt direto, sem contexto acumulado
         String prompt = String.format(
-                "%s\n" +
-                        "Agora, avalie a nova afirmação abaixo:\n\n" +
-                        "Pergunta do quiz: \"%s\"\n" +
-                        "Resposta do jogador: \"%s\"\n\n" +
-                        "Avalie se o jogador julgou corretamente a afirmação como 'Certo' ou 'Errado'.\n\n" +
-                        "Se estiver correto:\n" +
+                "A seguir, avalie APENAS a pergunta e a resposta fornecida abaixo:\n\n" +
+                        "%s\n\n" +
+                        "Se a resposta do jogador estiver correta, retorne:\n" +
                         "{\"correta\": true}\n" +
-                        "Se estiver incorreto:\n" +
+                        "Se estiver incorreta, retorne:\n" +
                         "{\"correta\": false, \"explicacao\": \"Explique brevemente o erro.\"}\n\n" +
                         "Responda apenas com o JSON.",
-                contexto, pergunta.getEnunciado(), pergunta.getRespostaDoJogador()
+                jsonPergunta
         );
 
         String resposta = this.ollamaClient.enviarPrompt(prompt);
@@ -201,7 +209,6 @@ public class QuizService {
         if (resposta == null) return false;
 
         boolean correta = OllamaParser.avaliarRespostaComExplicacao(resposta, explicacaoOut);
-
         return correta;
     }
 }
